@@ -1,0 +1,6 @@
+D:\YPNCloud\YPN.Git\ypn.common.csharp\ypn.common.csharp\bin\Debug\ypn.common.csharp.dll
+D:\YPNCloud\YPN.Git\ypn.common.csharp\ypn.common.csharp\bin\Debug\ypn.common.csharp.pdb
+D:\YPNCloud\YPN.Git\ypn.common.csharp\ypn.common.csharp\obj\Debug\ypn.common.csharp.csprojAssemblyReference.cache
+D:\YPNCloud\YPN.Git\ypn.common.csharp\ypn.common.csharp\obj\Debug\ypn.common.csharp.csproj.CoreCompileInputs.cache
+D:\YPNCloud\YPN.Git\ypn.common.csharp\ypn.common.csharp\obj\Debug\ypn.common.csharp.dll
+D:\YPNCloud\YPN.Git\ypn.common.csharp\ypn.common.csharp\obj\Debug\ypn.common.csharp.pdb
