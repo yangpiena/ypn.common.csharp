@@ -89,30 +89,30 @@ namespace ypn.common.csharp
             }
             return entities;
         }
-
-
+        
         /// <summary>
         /// 数据筛选
         /// YPN Create 2018-11-21
         /// </summary>
-        /// <param name="i_dataTable">数据表</param>
-        /// <param name="distinct">查询/去重的字段</param>
-        /// <param name="i_where">查询条件</param>
+        /// <param name="i_DataTable">数据表</param>
+        /// <param name="i_Distincts">查询/去重的字段数组</param>
+        /// <param name="i_Where">查询条件</param>
         /// <param name="i_orderBy">排序字段</param>
         /// <returns></returns>
-        public static DataTable DataFilter(DataTable i_dataTable, string distinct, string i_where, string i_orderBy)
+        /// 
+        public static DataTable DataFilter(DataTable i_DataTable, string[] i_Distincts, string i_Where, string i_orderBy)
         {
             // 筛选
-            DataTable v_NewTable = i_dataTable.Clone();
-            DataRow[] v_DataRows = i_dataTable.Select(i_where, i_orderBy);
+            DataTable v_NewTable = i_DataTable.Clone();
+            DataRow[] v_DataRows = i_DataTable.Select(i_Where, i_orderBy);
             foreach (DataRow v_DataRow in v_DataRows)
             {
                 v_NewTable.ImportRow(v_DataRow);
             }
             // 去重
             DataView v_DataView = v_NewTable.DefaultView;
-            v_NewTable = v_DataView.ToTable(true, new string[] { distinct });
-
+            v_NewTable = v_DataView.ToTable(true, i_Distincts);
+            
             return v_NewTable;
         }
     }
