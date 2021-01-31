@@ -1,27 +1,14 @@
-﻿/**
-* 命名空间： xx
-*
-* 功    能： 基于MemoryCache的缓存辅助类
-* 类    名： MemoryCacheHelper
-*
-* 版本  变更日期            负责人   变更内容
-* ───────────────────────────────────
-* V0.01 2018-11-21 12:23:15 YPN      初版
-*
-* Copyright (c) 2018 Fimeson. All rights reserved.
-*┌──────────────────────────────────┐
-*│　此技术信息为本公司机密信息，未经本公司书面同意禁止向第三方披露．　│
-*│　版权所有：宁夏菲麦森流程控制技术有限公司 　　　　　　　　　       │
-*└──────────────────────────────────┘
-*/
-using System;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Runtime.Caching;
-using System.Text;
-
 namespace ypn.common.csharp
 {
+    /// <summary>
+    /// 基于MemoryCache的缓存辅助类
+    /// </summary>
     public static class MemoryCacheHelper
     {
         private static readonly Object _locker = new object(); //线程同步
@@ -44,9 +31,9 @@ namespace ypn.common.csharp
         /// <returns>特定的元素值</returns>
         public static T GetCacheItem<T>(String i_key)
         {
-            if (string.IsNullOrWhiteSpace(i_key))     throw new ArgumentException("不合法的key!");
+            if (string.IsNullOrWhiteSpace(i_key)) throw new ArgumentException("不合法的key!"); 
             if (!MemoryCache.Default.Contains(i_key)) throw new ArgumentException("获取失败,不存在该key!");
-            if (!(MemoryCache.Default[i_key] is T))   throw new ArgumentException("未找到所需类型数据!");
+            if (!(MemoryCache.Default[i_key] is T)) throw new ArgumentException("未找到所需类型数据!");
 
             return (T)MemoryCache.Default[i_key];
         }
@@ -61,6 +48,23 @@ namespace ypn.common.csharp
         /// <returns></returns>
         public static bool SetCacheItem(string i_key, object i_value, TimeSpan? slidingExpiration = null, DateTime? absoluteExpiration = null)
         {
+            // YPN 2019-08-06 Add 如果缓存存在，则先移除
+            if (Contains(i_key))
+            {
+                //if (i_key.Contains("Dictionary"))
+                //{
+                //    RemoveCacheItem<Dictionary<string,string>>(i_key);
+                //}
+                //else if (i_key.Contains("HashTable"))
+                //{
+                //    RemoveCacheItem<Hashtable>(i_key);
+                //}
+                //else
+                //{
+                    RemoveCacheItem<DataTable>(i_key);
+                //}
+                
+            }
             var item = new CacheItem(i_key, i_value);
             var policy = CreatePolicy(slidingExpiration, absoluteExpiration);
             lock (_locker)
@@ -68,9 +72,52 @@ namespace ypn.common.csharp
                 return MemoryCache.Default.Add(item, policy);
             }
         }
-
         /// <summary>
-        /// 移出Cache元素
+        /// 缓存哈希表
+        /// </summary>
+        /// <param name="i_key"></param>
+        /// <param name="i_value"></param>
+        /// <param name="slidingExpiration"></param>
+        /// <param name="absoluteExpiration"></param>
+        /// <returns></returns>
+        public static bool SetCacheHastableItem(string i_key, object i_value, TimeSpan? slidingExpiration = null, DateTime? absoluteExpiration = null)
+        {
+            // YPN 2019-08-06 Add 如果缓存存在，则先移除
+            if (Contains(i_key))
+            {
+              RemoveCacheItem<Hashtable>(i_key);
+            }
+            var item = new CacheItem(i_key, i_value);
+            var policy = CreatePolicy(slidingExpiration, absoluteExpiration);
+            lock (_locker)
+            {
+                return MemoryCache.Default.Add(item, policy);
+            }
+        }
+        /// <summary>
+        /// 缓存字典
+        /// </summary>
+        /// <param name="i_key"></param>
+        /// <param name="i_value"></param>
+        /// <param name="slidingExpiration"></param>
+        /// <param name="absoluteExpiration"></param>
+        /// <returns></returns>
+        public static bool SetCacheDictionaryItem(string i_key, object i_value, TimeSpan? slidingExpiration = null, DateTime? absoluteExpiration = null)
+        {
+            // YPN 2019-08-06 Add 如果缓存存在，则先移除
+            if (Contains(i_key))
+            {
+                RemoveCacheItem<Dictionary<string,string>>(i_key);
+            }
+            var item = new CacheItem(i_key, i_value);
+            var policy = CreatePolicy(slidingExpiration, absoluteExpiration);
+            lock (_locker)
+            {
+                return MemoryCache.Default.Add(item, policy);
+            }
+        }
+        /// <summary>
+        /// 移除Cache元素
         /// </summary>
         /// <typeparam name="T">待移出元素的类型</typeparam>
         /// <param name="i_key">待移除元素的键</param>

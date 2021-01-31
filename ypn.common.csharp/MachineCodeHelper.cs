@@ -1,27 +1,12 @@
-﻿/**
-* 命名空间： ypn.common.csharp
-*
-* 功    能： 机器码辅助类
-* 类    名： MachineCodeHelper
-*
-* 版本  变更日期            负责人   变更内容
-* ───────────────────────────────────
-* V0.01 2018-11-21 22:56:02 YPN      初版
-*
-* Copyright (c) 2018 Fimeson. All rights reserved.
-*┌──────────────────────────────────┐
-*│　此技术信息为本公司机密信息，未经本公司书面同意禁止向第三方披露．　│
-*│　版权所有：宁夏菲麦森流程控制技术有限公司 　　　　　　　　　       │
-*└──────────────────────────────────┘
-*/
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
 using System.Management;
-using System.Text;
 
 namespace ypn.common.csharp
 {
+    /// <summary>
+    /// 机器码辅助类
+    /// </summary>
     public class MachineCodeHelper
     {
         /// <summary>
@@ -33,7 +18,7 @@ namespace ypn.common.csharp
         {
             return GetCPUInfo() + GetHDId() + GetMACAddress();
         }
-        
+
         /// <summary>
         /// 获取cpu序列号
         /// </summary>
@@ -41,6 +26,7 @@ namespace ypn.common.csharp
         public static string GetCPUInfo()
         {
             string cpuInfo = "";
+
             try
             {
                 using (ManagementClass cimobject = new ManagementClass("Win32_Processor"))
@@ -56,13 +42,13 @@ namespace ypn.common.csharp
             }
             catch (Exception)
             {
-                throw;
+                cpuInfo = "Unknown" + DateTime.Now.ToFileTimeUtc().ToString();
             }
             return cpuInfo;
         }
 
         /// <summary>
-        /// 获取硬盘ID 
+        /// 获取硬盘ID
         /// </summary>
         /// <returns></returns>
         public static string GetHDId()
@@ -82,14 +68,13 @@ namespace ypn.common.csharp
             }
             catch (Exception)
             {
-
-                throw;
+                HDid = "Unknown" + DateTime.Now.ToFileTimeUtc().ToString();
             }
             return HDid;
         }
 
         /// <summary>
-        /// 获取网卡硬件地址 
+        /// 获取网卡硬件地址
         /// </summary>
         /// <returns></returns>
         public static string GetMACAddress()
@@ -110,7 +95,7 @@ namespace ypn.common.csharp
             }
             catch (Exception)
             {
-                throw;
+                macAddress = "Unknown" + DateTime.Now.ToFileTimeUtc().ToString();
             }
             return macAddress;
         }

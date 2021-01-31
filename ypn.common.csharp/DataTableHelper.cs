@@ -1,20 +1,4 @@
-﻿/**
-* 命名空间： ypn.common.csharp
-*
-* 功    能： N/A
-* 类    名： DataTableHelper
-*
-* 版本  变更日期            负责人   变更内容
-* ───────────────────────────────────
-* V0.01 2018-11-21 16:45:15 YPN      初版
-*
-* Copyright (c) 2018 Fimeson. All rights reserved.
-*┌──────────────────────────────────┐
-*│　此技术信息为本公司机密信息，未经本公司书面同意禁止向第三方披露．　│
-*│　版权所有：宁夏菲麦森流程控制技术有限公司 　　　　　　　　　       │
-*└──────────────────────────────────┘
-*/
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -22,8 +6,17 @@ using System.Text;
 
 namespace ypn.common.csharp
 {
+    /// <summary>
+    /// 表格工具类
+    /// </summary>
     public static class DataTableHelper
     {
+        /// <summary>
+        /// 表格转实体类
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="table"></param>
+        /// <returns></returns>
         public static T ToEntity<T>(this DataTable table) where T : new()
         {
             T entity = new T();
@@ -57,6 +50,12 @@ namespace ypn.common.csharp
             return entity;
         }
 
+        /// <summary>
+        /// 表格转实体类集合
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="table"></param>
+        /// <returns></returns>
         public static List<T> ToEntities<T>(this DataTable table) where T : new()
         {
             List<T> entities = new List<T>();
@@ -89,10 +88,10 @@ namespace ypn.common.csharp
             }
             return entities;
         }
-        
+
         /// <summary>
         /// 数据筛选
-        /// YPN Create 2018-11-21
+        /// YPN 2018-11-21 Create
         /// </summary>
         /// <param name="i_DataTable">数据表</param>
         /// <param name="i_Distincts">查询/去重的字段数组</param>
@@ -102,18 +101,118 @@ namespace ypn.common.csharp
         /// 
         public static DataTable DataFilter(DataTable i_DataTable, string[] i_Distincts, string i_Where, string i_orderBy)
         {
-            // 筛选
             DataTable v_NewTable = i_DataTable.Clone();
-            DataRow[] v_DataRows = i_DataTable.Select(i_Where, i_orderBy);
-            foreach (DataRow v_DataRow in v_DataRows)
+            if (i_DataTable.Rows.Count > 0)
             {
-                v_NewTable.ImportRow(v_DataRow);
+                // 筛选
+                DataRow[] v_DataRows = i_DataTable.Select(i_Where);
+                foreach (DataRow v_DataRow in v_DataRows)
+                {
+                    v_NewTable.ImportRow(v_DataRow);
+                }
+                // 排序
+                v_NewTable.DefaultView.Sort = i_orderBy;
+                // 去重
+                DataView v_DataView = v_NewTable.DefaultView;
+                v_NewTable = v_DataView.ToTable(true, i_Distincts);
+                
             }
-            // 去重
-            DataView v_DataView = v_NewTable.DefaultView;
-            v_NewTable = v_DataView.ToTable(true, i_Distincts);
-            
+
             return v_NewTable;
         }
+        /// <summary>
+        /// 数据筛选
+        /// YPN 2018-11-21 Create
+        /// </summary>
+        /// <param name="i_DataTable">数据表</param>
+        /// <param name="i_Distincts">查询/去重的字段数组</param>
+        /// <param name="i_Where">查询条件</param>
+        /// <param name="i_orderBy">排序字段</param>
+        /// <returns></returns>
+        /// 
+        public static DataTable DataFilter(DataTable i_DataTable, string i_Where, string i_orderBy)
+        {
+            DataTable v_NewTable = i_DataTable.Clone();
+            if (i_DataTable.Rows.Count > 0)
+            {
+                // 筛选
+                DataRow[] v_DataRows = i_DataTable.Select(i_Where);
+                foreach (DataRow v_DataRow in v_DataRows)
+                {
+                    v_NewTable.ImportRow(v_DataRow);
+                }
+                // 排序
+                v_NewTable.DefaultView.Sort = i_orderBy;
+                // 去重
+                DataView v_DataView = v_NewTable.DefaultView;
+                v_NewTable = v_DataView.ToTable();
+
+            }
+
+            return v_NewTable;
+        }
+        #region datatable去重
+        /// <summary>
+        /// datatable去重
+        /// </summary>
+        /// <param name="dtSource">需要去重的datatable</param>
+        /// <param name="columnNames">依据哪些列去重</param>
+        /// <returns></returns>
+        public static DataTable GetDistinctTable(DataTable dtSource, params string[] columnNames)
+        {
+            DataTable distinctTable = dtSource.Clone();
+            try
+            {
+                if (dtSource != null && dtSource.Rows.Count > 0)
+                {
+                    DataView dv = new DataView(dtSource);
+                    distinctTable = dv.ToTable(true, columnNames);
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            return distinctTable;
+        }
+
+        /// <summary>
+        /// datatable去重
+        /// </summary>
+        /// <param name="dtSource">需要去重的datatable</param>
+        /// <returns></returns>
+        public static DataTable GetDistinctTable(DataTable dtSource)
+        {
+            DataTable distinctTable = null;
+            try
+            {
+                if (dtSource != null && dtSource.Rows.Count > 0)
+                {
+                    string[] columnNames = GetTableColumnName(dtSource);
+                    DataView dv = new DataView(dtSource);
+                    distinctTable = dv.ToTable(true, columnNames);
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            return distinctTable;
+        }
+
+        #endregion
+
+        #region 获取表中所有列名
+        public static string[] GetTableColumnName(DataTable dt)
+        {
+            string cols = string.Empty;
+            for (int i = 0; i < dt.Columns.Count; i++)
+            {
+                cols += (dt.Columns[i].ColumnName + ",");
+            }
+            cols = cols.TrimEnd(',');
+            return cols.Split(',');
+        }
+        #endregion
     }
 }

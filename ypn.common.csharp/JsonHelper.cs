@@ -1,20 +1,4 @@
-﻿/**
-* 命名空间： ypn.common.csharp
-*
-* 功    能： N/A
-* 类    名： JsonHelper
-*
-* 版本  变更日期            负责人   变更内容
-* ───────────────────────────────────
-* V0.01 2018-11-21 00:40:03 YPN      初版
-*
-* Copyright (c) 2018 Fimeson. All rights reserved.
-*┌──────────────────────────────────┐
-*│　此技术信息为本公司机密信息，未经本公司书面同意禁止向第三方披露．　│
-*│　版权所有：宁夏菲麦森流程控制技术有限公司 　　　　　　　　　       │
-*└──────────────────────────────────┘
-*/
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -24,9 +8,13 @@ using System.Collections;
 using System.Data.Common;
 using Newtonsoft.Json;
 using System.IO;
+using Newtonsoft.Json.Linq;
 
 namespace ypn.common.csharp
 {
+    /// <summary>
+    /// Json工具类
+    /// </summary>
     public class JsonHelper
     {
 
@@ -118,12 +106,14 @@ namespace ypn.common.csharp
                     Json.Append("{");
                     for (int j = 0; j < pi.Length; j++)
                     {
-                        Type type = pi[j].GetValue(list[i], null).GetType();
-                        Json.Append("\"" + pi[j].Name.ToString() + "\":" + StringFormat(pi[j].GetValue(list[i], null).ToString(), type));
-
-                        if (j < pi.Length - 1)
+                        if (pi[j].GetValue(list[i], null) != null)
                         {
-                            Json.Append(",");
+                            Type type = pi[j].GetValue(list[i], null).GetType();
+                            Json.Append("\"" + pi[j].Name.ToString() + "\":" + StringFormat(pi[j].GetValue(list[i], null).ToString(), type));
+                            if (j < pi.Length - 1)
+                            {
+                                Json.Append(",");
+                            }
                         }
                     }
                     Json.Append("}");
@@ -233,7 +223,7 @@ namespace ypn.common.csharp
         /// <summary> 
         /// Datatable转换为Json 
         /// </summary> 
-        /// <param name="table">Datatable对象</param> 
+        /// <param name="dt">Datatable对象</param> 
         /// <returns>Json字符串</returns> 
         public static string ToJson(DataTable dt)
         {
@@ -300,6 +290,29 @@ namespace ypn.common.csharp
         }
         #endregion
 
+        #region Datatable转换为Json 2
+
+        /// <summary>
+        /// Datatable转换为Json 2
+        /// </summary>
+        /// <param name="dt"></param>
+        /// <returns></returns>
+        public static List<Dictionary<string, object>> DataTableToDictionary(DataTable dt)
+        {
+            List<Dictionary<string, object>> list = new List<Dictionary<string, object>>();
+            foreach (DataRow dr in dt.Rows)
+            {
+                Dictionary<string, object> result = new Dictionary<string, object>();
+                foreach (DataColumn dc in dt.Columns)
+                {
+                    result.Add(dc.ColumnName, dr[dc].ToString());
+                }
+                list.Add(result);
+            }
+            return list;
+        }
+        #endregion
+
         #region DataReader转换为Json
         /// <summary> 
         /// DataReader转换为Json 
@@ -335,29 +348,6 @@ namespace ypn.common.csharp
             jsonString.Remove(jsonString.Length - 1, 1);
             jsonString.Append("]");
             return jsonString.ToString();
-        }
-        #endregion
-
-        #region Datatable转换为Json 2
-
-        /// <summary>
-        /// Datatable转换为Json 2
-        /// </summary>
-        /// <param name="dt"></param>
-        /// <returns></returns>
-        public static List<Dictionary<string, object>> DataTableToDictionary(DataTable dt)
-        {
-            List<Dictionary<string, object>> list = new List<Dictionary<string, object>>();
-            foreach (DataRow dr in dt.Rows)
-            {
-                Dictionary<string, object> result = new Dictionary<string, object>();
-                foreach (DataColumn dc in dt.Columns)
-                {
-                    result.Add(dc.ColumnName, dr[dc].ToString());
-                }
-                list.Add(result);
-            }
-            return list;
         }
         #endregion
 
@@ -428,6 +418,53 @@ namespace ypn.common.csharp
             return t;
         }
 
+        /// <summary>
+        /// 此方法可以将JSON字符串转换成任何指定类型的对象(JSON字符串需要和指定类型匹配)
+        /// </summary>
+        /// <typeparam name="T">指定的对象类型</typeparam>
+        /// <param name="jsonString">将要被转换的JSON字符串</param>
+        /// <returns>转换成功得到的对象，返回为null代表转换失败</returns>
+        public static T GetObjectFromJsonString<T>(String jsonString) where T : class
+        {
+            try
+            {
+                JsonSerializer serializer = new JsonSerializer();
+                StringReader sr = new StringReader(jsonString);
+                object result = serializer.Deserialize(new JsonTextReader(sr), typeof(T));
+                T obj = result as T;
+                return obj;
+            }
+            catch (Exception e)
+            {
+                System.Console.WriteLine(e.Message);
+                return null;
+            }
+        }
+        #endregion
+
+        #region 格式化Json字符串，使显示易懂
+        public static string ConvertJsonString(string str)
+        {
+            //格式化json字符串
+            JsonSerializer serializer = new JsonSerializer();
+            TextReader tr = new StringReader(str);
+            JsonTextReader jtr = new JsonTextReader(tr);
+            object obj = serializer.Deserialize(jtr);
+            if (obj != null)
+            {
+                StringWriter textWriter = new StringWriter();
+                JsonTextWriter jsonWriter = new JsonTextWriter(textWriter)
+                {
+                    Formatting = Formatting.Indented,
+                    Indentation = 4,
+                    IndentChar = ' '
+                };
+                serializer.Serialize(jsonWriter, obj);
+                return textWriter.ToString();
+            }
+
+            return str;
+        }
         #endregion
     }
 }

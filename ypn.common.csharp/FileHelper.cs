@@ -1,19 +1,14 @@
-﻿
-
-using System;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
+using System.Linq;
+using System.Net;
+using System.Reflection;
+using System.Resources;
 using System.Text;
-/**
-* 命名空间： ypn.common.csharp
-*
-* 功    能： 文件工具类
-* 类    名： FileHelper
-*
-* 版本  变更日期            负责人   变更内容
-* ───────────────────────────────────
-* V0.01 2018/10/19 14:02:50 YPN      初版
-*
-*/
+
 namespace ypn.common.csharp
 {
     /// <summary>
@@ -90,7 +85,31 @@ namespace ypn.common.csharp
             return v_len;
         }
         #endregion
-        
+
+        #region 将文件大小(字节)转换为最适合的显示方式
+        /// <summary>
+        /// 将文件大小(字节)转换为最适合的显示方式
+        /// </summary>
+        /// <param name="size">文件字节</param>
+        /// <returns>返回转换后的字符串</returns>
+        public static string ConvertFileSize(long size)
+        {
+            string result = "0KB";
+            int filelength = size.ToString().Length;
+            if (filelength < 4)
+                result = size + "byte";
+            else if (filelength < 7)
+                result = Math.Round(Convert.ToDouble(size / 1024d), 2) + "KB";
+            else if (filelength < 10)
+                result = Math.Round(Convert.ToDouble(size / 1024d / 1024), 2) + "MB";
+            else if (filelength < 13)
+                result = Math.Round(Convert.ToDouble(size / 1024d / 1024 / 1024), 2) + "GB";
+            else
+                result = Math.Round(Convert.ToDouble(size / 1024d / 1024 / 1024 / 1024), 2) + "TB";
+            return result;
+        }
+        #endregion
+
         #region 写文件
         /****************************************
          * 函数名称：WriteFile
@@ -278,6 +297,10 @@ namespace ypn.common.csharp
         #endregion
 
         #region 创建目录
+        /// <summary>
+        /// 创建目录
+        /// </summary>
+        /// <param name="Path"></param>
         public static void FileCreate(string Path)
         {
             FileInfo CreateFile = new FileInfo(Path); //创建文件 
@@ -564,6 +587,177 @@ namespace ypn.common.csharp
             return str;
         }
         #endregion
+
+        #region 将文件转换为byte数组
+        /// <summary>
+        /// 将文件转换为byte数组
+        /// </summary>
+        /// <param name="path">文件地址</param>
+        /// <returns>转换后的byte数组</returns>
+        public static byte[] File2Bytes(string path)
+        {
+            if (!System.IO.File.Exists(path))
+            {
+                return new byte[0];
+            }
+
+            FileInfo fi = new FileInfo(path);
+            byte[] buff = new byte[fi.Length];
+
+            FileStream fs = fi.OpenRead();
+            fs.Read(buff, 0, Convert.ToInt32(fs.Length));
+            fs.Close();
+
+            return buff;
+        }
+        #endregion
+
+        #region 将byte数组转换为文件并保存到指定地址
+        /// <summary>
+        /// 将byte数组转换为文件并保存到指定地址
+        /// </summary>
+        /// <param name="buff">byte数组</param>
+        /// <param name="savepath">保存地址</param>
+        public static void Bytes2File(byte[] buff, string savepath)
+        {
+            if (System.IO.File.Exists(savepath))
+            {
+                System.IO.File.Delete(savepath);
+            }
+
+            FileStream fs = new FileStream(savepath, FileMode.CreateNew);
+            BinaryWriter bw = new BinaryWriter(fs);
+            bw.Write(buff, 0, buff.Length);
+            bw.Close();
+            fs.Close();
+        }
+
+        #endregion
+
+        #region 根据键值获取对应资源文件的value值
+        /// <summary>
+        /// 根据键值获取对应资源文件的value值
+        /// </summary>
+        /// <param name="resxFileName">资源文件路径</param>
+        /// <param name="sKey">key名称</param>
+        /// <returns>string</returns>
+        public static string GetResxValue(string resxFileName, string sKey)
+        {
+
+            Assembly assembly = Assembly.LoadFile(AppDomain.CurrentDomain.BaseDirectory + "zh-CN/xxOffline.resources.dll");
+           // Type type = assembly.GetType("Resources." + "LogResource");
+            //System.Reflection.PropertyInfo[] pa = type.GetProperties();
+            ResourceManager re = new ResourceManager("resources", assembly);
+        
+            return re.GetString(sKey);
+        }
+        #endregion
+
+        #region Exception新增
+        /// <summary>
+        /// 当前目录
+        /// </summary>
+        public static string CurrentPath
+        {
+            get
+            {
+                var dir = AppDomain.CurrentDomain.BaseDirectory;
+                return dir;
+            }
+        }
+
+        /// <summary>
+        /// 防止锁定文件导致其他进程不能写
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static string ReadToEnd(string path)
+        {
+            using (var fs = new FileStream(path, FileMode.OpenOrCreate, FileAccess.Read, FileShare.ReadWrite))
+            using (var sr = new StreamReader(fs))
+            {
+                return sr.ReadToEnd();
+            }
+        }
+
+        /// <summary>
+        /// 删除过期文件
+        /// </summary>
+        /// <param name="path">目录路径</param>
+        /// <param name="dateTime">过期时间</param>
+        public static void DelExpireFiles(string path, DateTime dateTime)
+        {
+            if (!Directory.Exists(path)) return;
+            var files = GetAllFiles(path);
+            for (int i = 0; i < files?.Count; i++)
+            {
+                try
+                {
+                    var item = files[i];
+                    if (item.LastWriteTime < dateTime)
+                        item.Delete();
+                }
+                catch (Exception)
+                {
+                }
+            }
+        }
+
+        /// <summary>
+        /// 读取目录下的所有文件路径(不包含子目录)
+        /// </summary>
+        /// <returns></returns>
+        public static List<FileInfo> GetAllFiles(string path)
+        {
+            try
+            {
+                Directory.CreateDirectory(path);
+                DirectoryInfo directoryInfo = new DirectoryInfo(path);
+                var files = directoryInfo.GetFiles()?.ToList();
+                return files;
+            }
+            catch (Exception)
+            {
+                return new List<FileInfo>();
+            }
+        }
+
+        public static void DownloadOrUpdateFile(string localfileName, string serverFileName)
+        {
+            if (!File.Exists(localfileName))
+            {
+                using (var client = new WebClient())
+                {
+                    var bytes = client.DownloadData(serverFileName);
+                    using (var ms = new MemoryStream(bytes))
+                    {
+                    }
+                }
+            }
+        }
+
+        public static bool TryCopy(string sourceFileName, string destFileName, bool overwrite)
+        {
+            try
+            {
+                File.Copy(sourceFileName, destFileName, overwrite);
+                return true;
+            }
+            catch { }
+            return false;
+        }
+
+        public static bool TryDelete(string path)
+        {
+            try
+            {
+                File.Delete(path);
+                return true;
+            }
+            catch { }
+            return false;
+        }
+        #endregion 
 
     }
 }
