@@ -16,7 +16,15 @@ namespace ypn.common.csharp
     /// </summary>
     public class FileHelper
     {
-        #region 获取文件后缀名
+        /// <summary>
+        /// 从文件的绝对路径中获取文件名( 包含扩展名 )
+        /// </summary>
+        /// <param name="filePath">文件的绝对路径</param>        
+        public static string GetFileName(string filePath)
+        {
+            return Path.GetFileName(filePath);
+        }
+
         /// <summary>
         /// 获取文件后缀名
         /// </summary>
@@ -28,9 +36,7 @@ namespace ypn.common.csharp
             int    v_length  = i_filename.Length;
             return i_filename.Substring(v_start, v_length - v_start);
         }
-        #endregion
 
-        #region 去掉文件后缀名
         /// <summary>
         /// 去掉文件后缀名
         /// </summary>
@@ -41,9 +47,7 @@ namespace ypn.common.csharp
             int v_start = i_filename.LastIndexOf(".");
             return i_filename.Substring(0, v_start);
         }
-        #endregion
 
-        #region 获取文件大小
         /// <summary>
         /// 获取文件大小
         /// </summary>
@@ -54,9 +58,7 @@ namespace ypn.common.csharp
             FileInfo v_FileInfo = new FileInfo(i_filePath);
             return v_FileInfo.Length;
         }
-        #endregion
 
-        #region 获取文件夹大小
         /// <summary>
         /// 获取文件夹大小
         /// </summary>
@@ -84,15 +86,13 @@ namespace ypn.common.csharp
             }
             return v_len;
         }
-        #endregion
 
-        #region 将文件大小(字节)转换为最适合的显示方式
         /// <summary>
         /// 将文件大小(字节)转换为最适合的显示方式
         /// </summary>
         /// <param name="size">文件字节</param>
         /// <returns>返回转换后的字符串</returns>
-        public static string ConvertFileSize(long size)
+        public static string FormatFileSize(long size)
         {
             string result = "0KB";
             int filelength = size.ToString().Length;
@@ -108,9 +108,7 @@ namespace ypn.common.csharp
                 result = Math.Round(Convert.ToDouble(size / 1024d / 1024 / 1024 / 1024), 2) + "TB";
             return result;
         }
-        #endregion
 
-        #region 写文件
         /****************************************
          * 函数名称：WriteFile
          * 功能说明：当文件不存时，则创建文件，并追加文件
@@ -127,7 +125,6 @@ namespace ypn.common.csharp
         /// <param name="Strings">文件内容</param>
         public static void WriteFile(string Path, string Strings)
         {
-
             if (!System.IO.File.Exists(Path))
             {
                 System.IO.FileStream f = System.IO.File.Create(Path);
@@ -138,12 +135,8 @@ namespace ypn.common.csharp
             f2.WriteLine(Strings);
             f2.Close();
             f2.Dispose();
-
-
         }
-        #endregion
 
-        #region 读文件
         /****************************************
          * 函数名称：ReadFile
          * 功能说明：读取文本内容
@@ -172,9 +165,7 @@ namespace ypn.common.csharp
 
             return s;
         }
-        #endregion
 
-        #region 追加文件
         /****************************************
          * 函数名称：FileAdd
          * 功能说明：追加文件内容
@@ -197,9 +188,7 @@ namespace ypn.common.csharp
             sw.Close();
             sw.Dispose();
         }
-        #endregion
 
-        #region 拷贝文件
         /****************************************
          * 函数名称：FileCoppy
          * 功能说明：拷贝文件
@@ -219,9 +208,6 @@ namespace ypn.common.csharp
             File.Copy(OrignFile, NewFile, true);
         }
 
-        #endregion
-
-        #region 删除文件
         /****************************************
          * 函数名称：FileDel
          * 功能说明：删除文件
@@ -238,9 +224,7 @@ namespace ypn.common.csharp
         {
             File.Delete(Path);
         }
-        #endregion
 
-        #region 移动文件
         /****************************************
          * 函数名称：FileMove
          * 功能说明：移动文件
@@ -259,9 +243,7 @@ namespace ypn.common.csharp
         {
             File.Move(OrignFile, NewFile);
         }
-        #endregion
 
-        #region 在当前目录下创建目录
         /****************************************
          * 函数名称：FolderCreate
          * 功能说明：在当前目录下创建目录
@@ -281,9 +263,7 @@ namespace ypn.common.csharp
             Directory.SetCurrentDirectory(OrignFolder);
             Directory.CreateDirectory(NewFloder);
         }
-        #endregion
 
-        #region 创建文件夹
         /// <summary>
         /// 创建文件夹
         /// </summary>
@@ -294,9 +274,7 @@ namespace ypn.common.csharp
             if (!Directory.Exists(Path))
                 Directory.CreateDirectory(Path);
         }
-        #endregion
 
-        #region 创建目录
         /// <summary>
         /// 创建目录
         /// </summary>
@@ -310,9 +288,7 @@ namespace ypn.common.csharp
                 FS.Close();
             }
         }
-        #endregion
 
-        #region 递归删除文件夹目录及文件
         /****************************************
          * 函数名称：DeleteFolder
          * 功能说明：递归删除文件夹目录及文件
@@ -340,9 +316,7 @@ namespace ypn.common.csharp
                 Directory.Delete(dir, true); //删除已空文件夹                 
             }
         }
-        #endregion
 
-        #region 将指定文件夹下面的所有内容copy到目标文件夹下面 果目标文件夹为只读属性就会报错。
         /****************************************
          * 函数名称：CopyDir
          * 功能说明：将指定文件夹下面的所有内容copy到目标文件夹下面 果目标文件夹为只读属性就会报错。
@@ -388,9 +362,7 @@ namespace ypn.common.csharp
                 throw new Exception(ee.ToString());
             }
         }
-        #endregion
 
-        #region 获取指定文件夹下所有子目录及文件(树形)
         /****************************************
          * 函数名称：GetFoldAll(string Path)
          * 功能说明：获取指定文件夹下所有子目录及文件(树形)
@@ -412,9 +384,7 @@ namespace ypn.common.csharp
             return str;
 
         }
-        #endregion
 
-        #region 获取指定文件夹下所有子目录及文件函数
         /// <summary>
         /// 获取指定文件夹下所有子目录及文件函数
         /// </summary>
@@ -466,9 +436,7 @@ namespace ypn.common.csharp
             }
             return Rn;
         }
-        #endregion
 
-        #region 获取指定文件夹下所有子目录及文件(下拉框形)
         /****************************************
          * 函数名称：GetFoldAll(string Path)
          * 功能说明：获取指定文件夹下所有子目录及文件(下拉框形)
@@ -491,9 +459,7 @@ namespace ypn.common.csharp
             str = ListTreeShow(thisOne, 0, str, tplPath);
             return strDrop + str + "</select>";
         }
-        #endregion
 
-        #region 获取指定文件夹下所有子目录及文件函数
         /// <summary>
         /// 获取指定文件夹下所有子目录及文件函数
         /// </summary>
@@ -563,9 +529,7 @@ namespace ypn.common.csharp
             }
             return Rn;
         }
-        #endregion
 
-        #region 获取指定文件详细属性
         /****************************************
          * 函数名称：GetFileAttibe(string filePath)
          * 功能说明：获取指定文件详细属性
@@ -586,9 +550,7 @@ namespace ypn.common.csharp
             str += "详细路径:" + objFI.FullName + "<br>文件名称:" + objFI.Name + "<br>文件长度:" + objFI.Length.ToString() + "字节<br>创建时间" + objFI.CreationTime.ToString() + "<br>最后访问时间:" + objFI.LastAccessTime.ToString() + "<br>修改时间:" + objFI.LastWriteTime.ToString() + "<br>所在目录:" + objFI.DirectoryName + "<br>扩展名:" + objFI.Extension;
             return str;
         }
-        #endregion
 
-        #region 将文件转换为byte数组
         /// <summary>
         /// 将文件转换为byte数组
         /// </summary>
@@ -610,9 +572,7 @@ namespace ypn.common.csharp
 
             return buff;
         }
-        #endregion
 
-        #region 将byte数组转换为文件并保存到指定地址
         /// <summary>
         /// 将byte数组转换为文件并保存到指定地址
         /// </summary>
@@ -632,9 +592,6 @@ namespace ypn.common.csharp
             fs.Close();
         }
 
-        #endregion
-
-        #region 根据键值获取对应资源文件的value值
         /// <summary>
         /// 根据键值获取对应资源文件的value值
         /// </summary>
@@ -651,9 +608,7 @@ namespace ypn.common.csharp
         
             return re.GetString(sKey);
         }
-        #endregion
 
-        #region Exception新增
         /// <summary>
         /// 当前目录
         /// </summary>
@@ -757,7 +712,5 @@ namespace ypn.common.csharp
             catch { }
             return false;
         }
-        #endregion 
-
     }
 }

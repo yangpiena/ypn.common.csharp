@@ -50,7 +50,7 @@ namespace ypn.common.csharp
                     options.VectorRasterizationOptions.SmoothingMode = SmoothingMode.None;
                     image.Save(targetImagePath, options);
 
-                    keyValuePairs.Add("Size", image.Size.Width.ToString() + " X " + image.Size.Height.ToString());
+                    keyValuePairs.Add("resolution", image.Size.Width.ToString() + "*" + image.Size.Height.ToString());
                 }
                 Console.WriteLine("YPN....CDR2PNG，耗时 {0} 秒", DateTime.Now.Subtract(v_StartDT).TotalSeconds);
             }
@@ -128,6 +128,47 @@ namespace ypn.common.csharp
                 }
             }
             return true;
+        }
+
+        public static Dictionary<string, string> TIF2JPEG(string originImagePath, string targetImagePath)
+        {
+            DateTime v_StartDT = DateTime.Now;
+            Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
+            try
+            {
+                using (Image image = Image.Load(originImagePath))
+                {
+                    JpegOptions options = new Aspose.Imaging.ImageOptions.JpegOptions();
+                    options.VectorRasterizationOptions = (Aspose.Imaging.ImageOptions.VectorRasterizationOptions)image.GetDefaultOptions(new object[] { Color.White, image.Width, image.Height });
+                    options.VectorRasterizationOptions.TextRenderingHint = TextRenderingHint.SingleBitPerPixel;
+                    options.VectorRasterizationOptions.SmoothingMode = SmoothingMode.None;
+                    image.Save(targetImagePath, options);
+
+                    keyValuePairs.Add("Size", image.Size.Width.ToString() + " X " + image.Size.Height.ToString());
+                }
+                Console.WriteLine("YPN....CDR2PNG，耗时 {0} 秒", DateTime.Now.Subtract(v_StartDT).TotalSeconds);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("YPN....CDR2PNG....失败！耗时 {0} 秒", DateTime.Now.Subtract(v_StartDT).TotalSeconds);
+                return keyValuePairs;
+            }
+            return keyValuePairs;
+        }
+
+        /// <summary>
+        /// 获取TIF图像的层数
+        /// YPN 2021-02-05
+        /// </summary>
+        /// <param name="imagePath"></param>
+        /// <returns></returns>
+        public static string GetTIFLayer(string imagePath)
+        {
+            DateTime v_StartDT = DateTime.Now;
+            Aspose.Imaging.FileFormats.Tiff.TiffImage image = (Aspose.Imaging.FileFormats.Tiff.TiffImage)Aspose.Imaging.Image.Load(imagePath);
+            int layer = image.ExifData.ExifTags.Count();
+            Console.WriteLine("YPN....GetTIFLayer....{0}，耗时 {1} 秒", layer, DateTime.Now.Subtract(v_StartDT).TotalSeconds);
+            return layer.ToString();
         }
     }
 }

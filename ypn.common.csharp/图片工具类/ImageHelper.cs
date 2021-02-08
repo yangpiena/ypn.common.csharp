@@ -257,11 +257,13 @@ namespace ypn.common.csharp
             DateTime v_StartDT = DateTime.Now;
             Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
 
-            MagickImage image = new MagickImage(sourceFilePath); //获得一个图片对象
-            keyValuePairs.Add("ColorSpace", image.ColorSpace.ToString());
-            keyValuePairs.Add("Size", image.BoundingBox.ToString());
-            image.Write(targetFilePath); //以流的方式写入目标路径
-            image.Dispose(); //对象进行释放
+            using (MagickImage image = new MagickImage(sourceFilePath)) //获得一个图片对象
+            {
+                //keyValuePairs.Add("ColorSpace", image.ColorSpace.ToString());
+                keyValuePairs.Add("resolution", image.Width.ToString() + "*" + image.Height.ToString());
+                image.Write(targetFilePath); //以流的方式写入目标路径
+                //image.Dispose(); //对象进行释放
+            }
 
             Console.WriteLine("YPN....ConvertImage，耗时 {0} 秒", DateTime.Now.Subtract(v_StartDT).TotalSeconds);
             return keyValuePairs;

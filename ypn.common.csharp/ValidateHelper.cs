@@ -70,6 +70,7 @@ namespace ypn.common.csharp
             }
         }
         #endregion
+
         #region 验证ComboBox的输入内容，仅限输入正整数
         /// <summary>
         /// 验证TextBox的输入内容，仅限输入整数
@@ -99,6 +100,7 @@ namespace ypn.common.csharp
             }
         }
         #endregion
+
         #region 验证TextBox的输入内容，仅限输入浮点数
         /// <summary>
         /// 验证TextBox的输入内容，仅限输入浮点数
@@ -236,6 +238,7 @@ namespace ypn.common.csharp
             }
         }
         #endregion
+
         #region 验证邮箱
         /// <summary>
         /// 验证邮箱
@@ -252,18 +255,20 @@ namespace ypn.common.csharp
             return false;
         }
         #endregion
+
         #region 验证电话号码
         /// <summary>
-        /// 验证电话号码
+        /// 验证固定电话是否符合标准
         /// </summary>
-        /// <param name="i_TextBox"></param>
+        /// <param name="phone"></param>
         /// <returns></returns>
-        public static bool IsTelPhone(TextBox i_TextBox)
-        { 
-        
+        public static bool IsTelPhone(string phone)
+        {
+            if (StringHelper.IsNull(phone))
+                return false;
             Regex v_Regex1 = new Regex(@"^(\d{3,4}-)?\d{6,8}$");
-            Regex v_Regex2=  new Regex(@"^[1]+[3,5,7,8,9]+\d{9}");
-            if (v_Regex1.IsMatch(i_TextBox.Text)|| (v_Regex2.IsMatch(i_TextBox.Text)&& i_TextBox.Text.Length==11))
+            Regex v_Regex2 = new Regex(@"^[1]+[3,5,7,8,9]+\d{9}");
+            if (v_Regex1.IsMatch(phone) || (v_Regex2.IsMatch(phone) && phone.Length == 11))
             {
                 return true;
             }
@@ -271,10 +276,21 @@ namespace ypn.common.csharp
             {
                 return false;
             }
-                    
-          
+        }
+
+        /// <summary>
+        /// 校验手机号码是否符合标准
+        /// </summary>
+        /// <param name="mobile"></param>
+        /// <returns></returns>
+        public static bool IsMobilePhone(string mobile)
+        {
+            if (StringHelper.IsNull(mobile))
+                return false;
+            return Regex.IsMatch(mobile, @"^(13|14|15|16|18|19|17)\d{9}$");
         }
         #endregion
+
         #region 检查文件名称是否合法
         /// <summary>
         /// 检查文件名称是否合法
@@ -306,6 +322,7 @@ namespace ypn.common.csharp
         }
 
         #endregion
+
         #region 检查是否是纯数字
         public static bool IsNumeric(string str)
         {

@@ -22,3 +22,4 @@ D:\YPNCloud\YPN.Git\ypn.common.csharp\Test\bin\Debug\Magick.NET.Core.xml
 D:\YPNCloud\YPN.Git\ypn.common.csharp\Test\obj\Debug\Test.csproj.CopyComplete
 D:\YPNCloud\YPN.Git\ypn.common.csharp\Test\obj\Debug\Test.exe
 D:\YPNCloud\YPN.Git\ypn.common.csharp\Test\obj\Debug\Test.pdb
+D:\YPNCloud\YPN.Git\ypn.common.csharp\Test\obj\Debug\Test.Form2.resources

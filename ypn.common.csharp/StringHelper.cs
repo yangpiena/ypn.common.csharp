@@ -19,7 +19,6 @@ namespace ypn.common.csharp
     /// </summary>
     public class StringHelper
     {
-        #region 判断对象是否为空
         /// <summary>
         /// 判断对象是否为空，为空返回true
         /// </summary>
@@ -47,9 +46,7 @@ namespace ypn.common.csharp
             // 不为空
             return false;
         }
-        #endregion
 
-        #region 判断字符串是不是数字
         /// <summary>
         /// 判断字符串是不是数字
         /// </summary>
@@ -70,9 +67,7 @@ namespace ypn.common.csharp
             }
             return bReturn;
         }
-        #endregion
 
-        #region 判断字符数组是否存在重复的字符
         /// <summary>
         /// true：存在重复 false：不存在重复
         /// </summary>
@@ -94,9 +89,7 @@ namespace ypn.common.csharp
             }
             return false;
         }
-        #endregion
 
-        #region 去除字符串里的空格、回车、换行、Tab符等
         /// <summary>  
         /// 去除字符串里的空格、回车、换行、Tab符等
         /// </summary>  
@@ -106,6 +99,5 @@ namespace ypn.common.csharp
         {
             return i_str.Replace("\n", "").Replace("\t", "").Replace("\r", "").Trim();
         }
-        #endregion
     }
 }

@@ -15,3 +15,6 @@ D:\YPNCloud\YPN.Git\ypn.common.csharp\ypn.common.csharp\bin\Debug\Magick.NET-Q16
 D:\YPNCloud\YPN.Git\ypn.common.csharp\ypn.common.csharp\bin\Debug\Magick.NET.Core.xml
 D:\YPNCloud\YPN.Git\ypn.common.csharp\ypn.common.csharp\bin\Debug\SimplePsd.dll
 D:\YPNCloud\YPN.Git\ypn.common.csharp\ypn.common.csharp\bin\Debug\SimplePsd.pdb
+D:\YPNCloud\YPN.Git\ypn.common.csharp\ypn.common.csharp\bin\Debug\Aspose.PSD.dll
+D:\YPNCloud\YPN.Git\ypn.common.csharp\ypn.common.csharp\bin\Debug\ICSharpCode.SharpZipLib.dll
+D:\YPNCloud\YPN.Git\ypn.common.csharp\ypn.common.csharp\bin\Debug\Aspose.PSD.xml

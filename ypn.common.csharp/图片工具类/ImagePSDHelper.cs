@@ -48,23 +48,25 @@ namespace ypn.common.csharp
         /// <param name="originImagePath"></param>
         /// <param name="targetImagePath"></param>
         /// <param name="fileInfos"></param>
-        public static void PSD2PNG(string originImagePath, string targetImagePath, ref Dictionary<string, string> fileInfos)
+        public static Dictionary<string, string> PSD2PNG(string originImagePath, string targetImagePath)
         {
             DateTime v_StartDT = DateTime.Now;
-            Console.WriteLine("Running PSD2PNG");
+            Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
+
             // implement correct Crop method for PSD files.
             using (RasterImage image = Aspose.PSD.Image.Load(originImagePath) as RasterImage)
             {
-                fileInfos.Add("层数", image.BitsPerPixel.ToString());
+                keyValuePairs.Add("层数", image.BitsPerPixel.ToString());
                 Console.WriteLine(image.TransparentColor);
-                fileInfos.Add("分辨率", image.HorizontalResolution.ToString() + "DPI");
-                fileInfos.Add("图像尺寸", image.Size.Width.ToString() + " X " + image.Size.Height.ToString());
+                keyValuePairs.Add("分辨率", image.HorizontalResolution.ToString() + "DPI");
+                keyValuePairs.Add("图像尺寸", image.Size.Width.ToString() + " X " + image.Size.Height.ToString());
 
                 //image.Crop(new Aspose.PSD.Rectangle(10, 30, 100, 100));
                 image.Save(targetImagePath, new PngOptions() { ColorType = PngColorType.TruecolorWithAlpha });
             }
-            Console.WriteLine("Finished PSD2PNG");
-            Console.WriteLine("....PSD2PNG，耗时 {0} 秒", DateTime.Now.Subtract(v_StartDT).TotalSeconds);
+
+            Console.WriteLine("YPN....PSD2PNG，耗时 {0} 秒", DateTime.Now.Subtract(v_StartDT).TotalSeconds);
+            return keyValuePairs;
         }
 
         /// <summary>
@@ -73,7 +75,7 @@ namespace ypn.common.csharp
         /// <param name="i_sourceFilePath"></param>
         /// <param name="i_targetFilePath"></param>
         /// <returns></returns>
-        public static string PSD2PNG(string i_sourceFilePath, string i_targetFilePath)
+        public static string PSD2PNG2(string i_sourceFilePath, string i_targetFilePath)
         {
             SimplePsd.CPSD psd = new SimplePsd.CPSD();
             string v_result = "";
@@ -125,6 +127,37 @@ namespace ypn.common.csharp
             return v_result;
         }
 
+        /// <summary>
+        /// 获取PSD图像的层数
+        /// YPN 2021-02-05
+        /// </summary>
+        /// <param name="imagePath"></param>
+        /// <returns></returns>
+        public static string GetPSDLayer(string imagePath)
+        {
+            DateTime v_StartDT = DateTime.Now;
+            int layer = 0;
+            try
+            {
+                using (RasterImage image = Aspose.PSD.Image.Load(imagePath) as RasterImage)
+                {
+                    foreach (var item in ((Aspose.PSD.FileFormats.Psd.PsdImage)image).Layers)
+                    {
+                        if (item.GetType() == typeof(Aspose.PSD.FileFormats.Psd.Layers.Layer))
+                        {
+                            layer++;
+                        }
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("YPN....GetPSDLayer....失败！，耗时 {1} 秒", layer, DateTime.Now.Subtract(v_StartDT).TotalSeconds);
+            }
+            Console.WriteLine("YPN....GetPSDLayer....{0}，耗时 {1} 秒", layer, DateTime.Now.Subtract(v_StartDT).TotalSeconds);
+            return layer.ToString();
+        }
+
         public static Dictionary<string, string> AI2JPEG(string originImagePath, string targetImagePath)
         {
             DateTime v_StartDT = DateTime.Now;
@@ -135,9 +168,9 @@ namespace ypn.common.csharp
                 ImageOptionsBase options = new JpegOptions();
                 image.Save(targetImagePath, options);
 
-                keyValuePairs.Add("Size", image.Size.Width.ToString() + " X " + image.Size.Height.ToString());
+                keyValuePairs.Add("resolution", image.Size.Width.ToString() + "*" + image.Size.Height.ToString());
             }
-            Console.WriteLine("....AI2JPEG，耗时 {0} 秒", DateTime.Now.Subtract(v_StartDT).TotalSeconds);
+            Console.WriteLine("ypn....AI2JPEG，耗时 {0} 秒", DateTime.Now.Subtract(v_StartDT).TotalSeconds);
             return keyValuePairs;
         }
 
