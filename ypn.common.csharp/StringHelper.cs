@@ -99,5 +99,14 @@ namespace ypn.common.csharp
         {
             return i_str.Replace("\n", "").Replace("\t", "").Replace("\r", "").Trim();
         }
+
+        public static string CutString(string str, int firstLength, int lastLength)
+        {
+            if ((firstLength+ lastLength)>=str.Length)
+            {
+                return str;
+            }
+            return str.Substring(0, firstLength) + "..." + str.Substring(str.Length - lastLength, lastLength);
+        }
     }
 }

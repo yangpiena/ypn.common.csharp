@@ -117,5 +117,25 @@ namespace ypn.common.csharp
             byte[] plainText = transform.TransformFinalBlock(encryptedData, 0, encryptedData.Length);
             return Encoding.UTF8.GetString(plainText);
         }
+
+        public static string AESDecode(string text, string key)
+        {
+            RijndaelManaged rijndaelManaged = new RijndaelManaged();
+            rijndaelManaged.Mode = CipherMode.CBC;
+            rijndaelManaged.Padding = PaddingMode.Zeros;
+            rijndaelManaged.KeySize = 128;
+            rijndaelManaged.BlockSize = 128;
+            byte[] encryptedData = Convert.FromBase64String(text);
+            byte[] pwdBytes = System.Text.Encoding.UTF8.GetBytes(key);
+            byte[] keyBytes = new byte[16];
+            int len = pwdBytes.Length;
+            if (len > keyBytes.Length)
+                len = keyBytes.Length;
+            System.Array.Copy(pwdBytes, keyBytes, len);
+            rijndaelManaged.Key = keyBytes;
+            ICryptoTransform transform = rijndaelManaged.CreateDecryptor();
+            byte[] plainText = transform.TransformFinalBlock(encryptedData, 0, encryptedData.Length);
+            return Encoding.UTF8.GetString(plainText);
+        }
     }
 }

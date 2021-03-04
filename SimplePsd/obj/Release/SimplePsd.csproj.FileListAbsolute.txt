@@ -1,0 +1,4 @@
+D:\YPNCloud\YPN.Git\ypn.common.csharp\SimplePsd\bin\Release\SimplePsd.dll
+D:\YPNCloud\YPN.Git\ypn.common.csharp\SimplePsd\obj\Release\SimplePsd.csproj.CoreCompileInputs.cache
+D:\YPNCloud\YPN.Git\ypn.common.csharp\SimplePsd\obj\Release\SimplePsd.dll
+D:\YPNCloud\YPN.Git\ypn.common.csharp\SimplePsd\obj\Release\SimplePsd.csprojAssemblyReference.cache

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -15,59 +16,19 @@ namespace ypn.common.csharp
     public class HttpHelper
     {
         /// <summary>
-        /// HttpWebRequest 通过 Post
-        /// </summary>
-        /// <param name="url">url</param>
-        /// <param name="postData">post数据</param>
-        /// <returns></returns>
-        public static string Post(string url, string postData)
-        {
-            DateTime v_StartDT = DateTime.Now;
-            string result = "";
-            try
-            {
-                HttpWebRequest req = WebRequest.Create(new Uri(url)) as HttpWebRequest;
-                req.Method = "POST";
-                req.KeepAlive = true;
-                req.ContentType = "application/json";
-                req.AllowAutoRedirect = true;
-                byte[] data = Encoding.UTF8.GetBytes(postData);//把字符串转换为字节
-                req.ContentLength = data.Length;//请求长度
-                                                //获取
-                using (Stream reqStream = req.GetRequestStream())
-                {
-                    reqStream.Write(data, 0, data.Length);//向当前流中写入字节
-                    reqStream.Close(); //关闭当前流
-                }
-                HttpWebResponse res = req.GetResponse() as HttpWebResponse;//响应结果
-                Stream stream = res.GetResponseStream();
-                //获取响应内容
-                using (StreamReader reader = new StreamReader(stream, Encoding.UTF8))
-                {
-                    result = reader.ReadToEnd();
-                }
-            }
-            catch (Exception e)
-            {
-                return JsonHelper.SerializeObjectToJson(new { code = "999", msg = e.Message });
-            }
-            Console.WriteLine("ypn....Post，耗时 {0} 秒", DateTime.Now.Subtract(v_StartDT).TotalSeconds);
-            return result;
-        }
-
-        /// <summary>
-        /// HttpWebRequest 通过get
+        /// HttpWebRequest通过GET
         /// </summary>
         /// <param name="url">URI</param>
         /// <returns></returns>
-        public static string Get(string url, string token = "")
+        public static string GET(string url, string token = "")
         {
             DateTime v_StartDT = DateTime.Now;
             string responseContent = "";
             try
             {
-                Console.WriteLine("ypn....Get....{0}", url);
-                Console.WriteLine("ypn....Get....{0}", token);
+                Console.WriteLine("\n");
+                Console.WriteLine("YPN {0} GET   URL: {1}", v_StartDT , url);
+                Console.WriteLine("YPN {0} GET token: {1}", v_StartDT , token);
                 HttpWebRequest httpWebRequest = (HttpWebRequest)WebRequest.Create(url);
                 if (!StringHelper.IsNull(token)) httpWebRequest.Headers["Authorization"] = token;
                 httpWebRequest.ContentType = "application/x-www-form-urlencoded";
@@ -89,400 +50,228 @@ namespace ypn.common.csharp
             {
                 return JsonHelper.SerializeObjectToJson(new { code = "999", msg = e.Message });
             }
-            Console.WriteLine("ypn....Get，耗时 {0} 秒", DateTime.Now.Subtract(v_StartDT).TotalSeconds);
+            Console.WriteLine("YPN {0} GET  耗时: {1} 秒", v_StartDT, DateTime.Now.Subtract(v_StartDT).TotalSeconds);
             return responseContent;
         }
-        
+
         /// <summary>
-        /// HttpWebRequest 通过get
+        /// HttpWebRequest通过POST
         /// </summary>
-        /// <param name="url">URI</param>
-        /// <param name="filePath">filePath</param>
-        /// <param name="mg">mg</param>
+        /// <param name="url">url</param>
+        /// <param name="postData">post数据</param>
         /// <returns></returns>
-        public static bool GetDataGetHtml(string url, string filePath, ref string mg)
+        public static string POST(string url, string postData, string token = "")
         {
+            DateTime v_StartDT = DateTime.Now;
+            string result = "";
             try
             {
-                HttpWebRequest httpWebRequest = (HttpWebRequest)WebRequest.Create(url);
-
-                httpWebRequest.ContentType = "application/x-www-form-urlencoded";
-                httpWebRequest.Method = "GET";
-                //对发送的数据不使用缓存
-                httpWebRequest.AllowWriteStreamBuffering = false;
-                httpWebRequest.Timeout = 300000;
-                httpWebRequest.ServicePoint.Expect100Continue = false;
-
-                HttpWebResponse webRespon = (HttpWebResponse)httpWebRequest.GetResponse();
-                Stream webStream = webRespon.GetResponseStream();
-                if (webStream == null)
+                Console.WriteLine("\n");
+                Console.WriteLine("YPN {0} POST      url: {1}", v_StartDT, url);
+                Console.WriteLine("YPN {0} POST postData: {1}", v_StartDT, postData);
+                Console.WriteLine("YPN {0} POST    token: {1}", v_StartDT, token);
+                HttpWebRequest req = WebRequest.Create(new Uri(url)) as HttpWebRequest;
+                req.Method = "POST";
+                req.KeepAlive = true;
+                req.ContentType = "application/json";
+                req.AllowAutoRedirect = true;
+                byte[] data = Encoding.UTF8.GetBytes(postData);//把字符串转换为字节
+                req.ContentLength = data.Length;//请求长度
+                if (!StringHelper.IsNull(token)) req.Headers["Authorization"] = token;
+                //获取
+                using (Stream reqStream = req.GetRequestStream())
                 {
-                    return false;
+                    reqStream.Write(data, 0, data.Length);//向当前流中写入字节
+                    reqStream.Close(); //关闭当前流
                 }
-                StreamReader streamReader = new StreamReader(webStream, Encoding.UTF8);
-                string responseContent = streamReader.ReadToEnd();
-                mg = responseContent;
-                webRespon.Close();
-                streamReader.Close();
-                if (responseContent.ToUpper().IndexOf("NULL") > -1)
+                HttpWebResponse res = req.GetResponse() as HttpWebResponse;//响应结果
+                Stream stream = res.GetResponseStream();
+                //获取响应内容
+                using (StreamReader reader = new StreamReader(stream, Encoding.UTF8))
                 {
-                    return false;
-                }
-                else
-                {
-                    FileStream fs = new FileStream(filePath, FileMode.Create);
-                    var buff = Encoding.UTF8.GetBytes(responseContent);
-                    fs.Write(buff, buff.Length, 0);
-                    fs.Close();
-                    return true;
+                    result = reader.ReadToEnd();
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return false;
+                return JsonHelper.SerializeObjectToJson(new { code = "999", msg = e.Message, retTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss", DateTimeFormatInfo.InvariantInfo) });
             }
+            Console.WriteLine("YPN {0} POST     耗时: {1} 秒", v_StartDT, DateTime.Now.Subtract(v_StartDT).TotalSeconds);
+            return result;
         }
 
         /// <summary>
-        /// 将本地文件上传到指定的服务器(HttpWebRequest方法)
+        /// 通过POST模拟multipart/form-data提交带文件的表单
         /// </summary>
-        /// <param name="address">文件上传到的服务器</param>
-        /// <param name="fileNamePath">要上传的本地文件（全路径）</param>
-        /// <param name="saveName">文件上传后的名称</param>
-        /// <returns>成功返回1，失败返回0</returns> 
-        public static int Upload_Request(string address, string fileNamePath, string saveName)
+        /// <param name="url"></param>
+        /// <param name="file"></param>
+        /// <param name="cookie"></param>
+        /// <returns></returns>
+        public static string PostFile(string url, string file, string cookie = "")
         {
-            // 要上传的文件
-            try
-            {
-                if (!File.Exists(fileNamePath))
-                {
-                    return 0;
-                }
-                FileStream fs = new FileStream(fileNamePath, FileMode.Open, FileAccess.Read);
-                return Upload_Request(address, fs, saveName);
-            }
-            catch (Exception)
-            {
-                return 0;
-            }
-        }
+            //1、数据边界
+            string boundary = "---------------------------" + DateTime.Now.Ticks.ToString("x");
+            //2、创建HttpWebRequest请求
+            HttpWebRequest myRequest = WebRequest.Create(url) as HttpWebRequest;
+            if (!StringHelper.IsNull(cookie)) myRequest.Headers["Cookie"] = cookie;
+            myRequest.Method = "POST";
+            //3、设置请求ContentType 和 边界字符（边界字符必须和请求数据体的边界字符一致 否则服务器无法解析）
+            myRequest.ContentType = "multipart/form-data;boundary=" + boundary;
 
-        /// <summary>
-        /// 将本地文件流上传到指定的服务器(HttpWebRequest方法)
-        /// </summary>
-        /// <param name="address">文件上传到的服务器</param>
-        /// <param name="fileStream">要上传的本地文件流</param>
-        /// <param name="saveName">文件上传后的名称</param>
-        /// <returns>成功返回1，失败返回0</returns> 
-        public static int Upload_Request(string address, Stream fileStream, string saveName)
-        {
-            int returnValue = 0;
-            fileStream.Position = 0;
-            var r = new BinaryReader(fileStream);
-            //时间戳
-            string strBoundary = "----------" + DateTime.Now.Ticks.ToString("x");
-            byte[] boundaryBytes = Encoding.ASCII.GetBytes("\r\n--" + strBoundary + "\r\n");
-            //请求头部信息
+            //4、添加文件数据描述信息
             StringBuilder sb = new StringBuilder();
-            sb.Append("--");
-            sb.Append(strBoundary);
+            sb.Append("--" + boundary);
             sb.Append("\r\n");
-            sb.Append("Content-Disposition: form-data; name=\"");
-            sb.Append("file");
-            sb.Append("\"; filename=\"");
-            sb.Append(saveName);
-            sb.Append("\"");
+            //name 为 上传文件的input name
+            sb.Append("Content-Disposition: form-data; name='MAX_FILE_SIZE'; filename=\"" + file + "\"");
             sb.Append("\r\n");
-            sb.Append("Content-Type: ");
-            sb.Append("application/octet-stream");
-            sb.Append("\r\n");
-            sb.Append("\r\n");
-            string strPostHeader = sb.ToString();
-            byte[] postHeaderBytes = Encoding.UTF8.GetBytes(strPostHeader);
-            try
+            sb.Append("Content-Type: application/octet-stream"); //此处则为模拟的文件类型，实际情况下浏览器会根据本地文件后缀名判断此类型
+            sb.Append("\r\n\r\n");
+            Encoding encoding = Encoding.GetEncoding("gbk"); //此处编码须与网页编码一直 否则导致中文路径或文件名乱码 但文件内容不会乱码
+            byte[] form_data = encoding.GetBytes(sb.ToString());
+
+            //5、表尾数据
+            byte[] foot_data = encoding.GetBytes("\r\n--" + boundary + "--\r\n");
+
+
+            //6、读取文件
+            using (FileStream fileStream = new FileStream(file, FileMode.Open, FileAccess.Read))
             {
-                // 根据uri创建HttpWebRequest对象
-                HttpWebRequest httpReq = (HttpWebRequest)WebRequest.Create(new Uri(address));
-                httpReq.Method = "POST";
-                //对发送的数据不使用缓存
-                httpReq.AllowWriteStreamBuffering = false;
-                //设置获得响应的超时时间（300秒）
-                httpReq.Timeout = 300000;
-                httpReq.ServicePoint.Expect100Continue = false;
-                httpReq.ContentType = "multipart/form-data; boundary=" + strBoundary;
-                long length = fileStream.Length + postHeaderBytes.Length + boundaryBytes.Length;
-                long fileLength = fileStream.Length;
-                httpReq.ContentLength = length;
-                byte[] buffer = new byte[fileLength];
-                Stream postStream = httpReq.GetRequestStream();
-                //发送请求头部消息
-                postStream.Write(postHeaderBytes, 0, postHeaderBytes.Length);
-                int size = r.Read(buffer, 0, buffer.Length);
-                postStream.Write(buffer, 0, size);
-                //添加尾部的时间戳
-                postStream.Write(boundaryBytes, 0, boundaryBytes.Length);
-                postStream.Close();
-                //获取服务器端的响应
-                HttpWebResponse webRespon = (HttpWebResponse)httpReq.GetResponse();
-                if (webRespon.StatusCode == HttpStatusCode.OK) //如果服务器未响应，那么继续等待相应                 
-                {
-                    Stream s = webRespon.GetResponseStream();
-                    StreamReader sr = new StreamReader(s);
-                    //读取服务器端返回的消息
-                    String sReturnString = sr.ReadLine();
-                    s.Close();
-                    sr.Close();
-                    fileStream.Close();
-                    if (sReturnString == "Success")
-                    {
-                        returnValue = 1;
-                    }
-                    else
-                    {
-                        returnValue = 0;
-                    }
-                }
-            }
-            catch (Exception)
-            {
-                returnValue = 0;
-            }
-            return returnValue;
-        }
-       
-        /// <summary>
-        /// 将本地文件上传到指定服务器上（HttpWebRequest方法），并传递相应参数
-        /// </summary>
-        /// <param name="url">文件上传到的服务器</param>
-        /// <param name="fileKeyName">类型（此处为文件--file）</param>
-        /// <param name="filePath">要上传的本地文件（全路径）</param>
-        /// <param name="filename">文件上传后的名称</param>
-        /// <param name="stringDict">参数集合</param>
-        /// <param name="timeOut">请求时效</param>
-        /// <returns></returns>
-        public static string HttpPostData(string url, string fileKeyName, string filePath, string filename, NameValueCollection stringDict, int timeOut = 900000)
-        {
-            string responseContent;
-            try
-            {
-                var memStream = new MemoryStream();
-                var webRequest = (HttpWebRequest)WebRequest.Create(url);
-                // 边界符
-                var boundary = "---------------" + DateTime.Now.Ticks.ToString("x");
-                // 边界符
-                var beginBoundary = Encoding.ASCII.GetBytes("--" + boundary + "\r\n");
-                var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
-                // 最后的结束符
-                var endBoundary = Encoding.ASCII.GetBytes("--" + boundary + "--\r\n");
+                StringBuilder sb2 = new StringBuilder();
+                sb2.Append("--" + boundary);
+                sb2.Append("\r\n");
+                sb2.Append("Content-Disposition: form-data; name='username';\r\n"); //发送的内容标题
+                sb2.Append("\r\n");
+                sb2.Append("中文名称"); //发送的内容
+                sb2.Append("\r\n"); //每一组数据结束都需要添加换行字符
 
-                // 设置属性
-                webRequest.Method = "POST";
-                webRequest.Timeout = timeOut;
-                webRequest.ContentType = "multipart/form-data; boundary=" + boundary;
+                sb2.Append("--" + boundary);
+                sb2.Append("\r\n");
+                sb2.Append("Content-Disposition: form-data; name='pwd';\r\n");
+                sb2.Append("\r\n");
+                sb2.Append("QADSFDSFA");
+                sb2.Append("\r\n");
 
-                // 写入文件
-                const string filePartHeader = "Content-Disposition: form-data; name=\"{0}\"; filename=\"{1}\"\r\n" + "Content-Type: application/octet-stream\r\n\r\n";
-                var header = string.Format(filePartHeader, fileKeyName, filename);
-                var headerbytes = Encoding.UTF8.GetBytes(header);
+                byte[] data = encoding.GetBytes(sb2.ToString());
 
-                memStream.Write(beginBoundary, 0, beginBoundary.Length);
-                memStream.Write(headerbytes, 0, headerbytes.Length);
+                //6、设置上传数据长度为表头 + 文件 + 表尾长度
+                myRequest.ContentLength = form_data.Length + foot_data.Length + fileStream.Length + data.Length;
 
-                var buffer = new byte[1024];
-                int bytesRead; // =0
+                //7、得到请求的数据流
+                Stream requestStream = myRequest.GetRequestStream();
+                //8.1、将字符信息数据写入请求流
+                requestStream.Write(data, 0, data.Length);
+                //8.2、将文件信息数据写入请求流
+                requestStream.Write(form_data, 0, form_data.Length);
 
+                //9、循环读取文件流 并写入请求流
+                byte[] buffer = new Byte[checked((uint)Math.Min(4096, (int)fileStream.Length))];
+                int bytesRead = 0;
                 while ((bytesRead = fileStream.Read(buffer, 0, buffer.Length)) != 0)
                 {
-                    memStream.Write(buffer, 0, bytesRead);
+                    requestStream.Write(buffer, 0, bytesRead);
                 }
 
-                // 写入字符串的Key
-                var stringKeyHeader = "\r\n--" + boundary + "\r\nContent-Disposition: form-data; name=\"{0}\"" + "\r\n\r\n{1}\r\n";
-
-                foreach (byte[] formitembytes in from string key in stringDict.Keys select string.Format(stringKeyHeader, key, stringDict[key]) into formitem select Encoding.UTF8.GetBytes(formitem))
-                {
-                    memStream.Write(formitembytes, 0, formitembytes.Length);
-                }
-
-                // 写入最后的结束边界符
-                memStream.Write(endBoundary, 0, endBoundary.Length);
-
-                webRequest.ContentLength = memStream.Length;
-
-                var requestStream = webRequest.GetRequestStream();
-
-                memStream.Position = 0;
-                var tempBuffer = new byte[memStream.Length];
-                memStream.Read(tempBuffer, 0, tempBuffer.Length);
-                memStream.Close();
-
-                requestStream.Write(tempBuffer, 0, tempBuffer.Length);
-                requestStream.Close();
-
-                var httpWebResponse = (HttpWebResponse)webRequest.GetResponse();
-
-                using (var httpStreamReader = new StreamReader(httpWebResponse.GetResponseStream(), Encoding.GetEncoding("utf-8")))
-                {
-                    responseContent = httpStreamReader.ReadToEnd();
-                }
-
-                fileStream.Close();
-                httpWebResponse.Close();
-                webRequest.Abort();
+                //10、将结束边界数据写入请求流
+                requestStream.Write(foot_data, 0, foot_data.Length);
             }
-            catch (Exception ex)
-            {
-                responseContent = ex.Message;
-            }
-            return responseContent;
+            //11、发起请求
+            HttpWebResponse myResponse = myRequest.GetResponse() as HttpWebResponse;
+            //12、读取请求返回的数据流
+            StreamReader sr = new StreamReader(myResponse.GetResponseStream(), encoding);
+            return sr.ReadToEnd();
         }
 
         /// <summary>
-        /// Http下载文件支持断点续传
+        /// 通过POST模拟multipart/form-data提交带文件的表单
         /// </summary>
-        /// <param name="uri">下载地址</param>
-        /// <param name="filefullpath">存放完整路径（含文件名）</param>
-        /// <param name="size">每次多的大小</param>
-        /// <returns>下载操作是否成功</returns>
-        public static bool HttpDownLoadFiles(string uri, string filefullpath, int size = 1024)
+        /// <param name="url"></param>
+        /// <param name="file"></param>
+        /// <param name="cookie"></param>
+        /// <returns></returns>
+        public static string PostFile(string url, byte[] file, string cookie = "")
         {
+            DateTime v_StartDT = DateTime.Now;
+            string result = "";
+            Console.WriteLine("\nypn....PostFile......url: {0}", url);
+            Console.WriteLine("ypn....PostFile...cookie: {0}", cookie);
             try
             {
-                string fileDirectory = System.IO.Path.GetDirectoryName(filefullpath);
-                if (!Directory.Exists(fileDirectory))
-                {
-                    Directory.CreateDirectory(fileDirectory);
-                }
-                string fileFullPath = filefullpath;
-                string fileTempFullPath = filefullpath + ".tmp";
+                //1、数据边界
+                string boundary = "---------------------------" + DateTime.Now.Ticks.ToString("x");
 
-                if (File.Exists(fileFullPath))
-                {
-                    return true;
-                }
-                else
-                {
-                    if (File.Exists(fileTempFullPath))
-                    {
-                        FileStream fs = new FileStream(fileTempFullPath, FileMode.Append, FileAccess.Write, FileShare.ReadWrite);
+                //2、创建HttpWebRequest请求
+                HttpWebRequest request = WebRequest.Create(url) as HttpWebRequest;
+                if (!StringHelper.IsNull(cookie)) request.Headers["Cookie"] = cookie;
+                request.Method = "POST";
 
-                        byte[] buffer = new byte[512];
-                        HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(uri);
+                //3、设置请求ContentType 和 边界字符（边界字符必须和请求数据体的边界字符一致 否则服务器无法解析）
+                request.ContentType = "multipart/form-data;boundary=" + boundary;
 
-                        request.Timeout = 10000;
-                        request.AddRange((int)fs.Length);
+                //4、添加文件数据描述信息
+                StringBuilder sb = new StringBuilder();
+                sb.Append("--" + boundary);
+                sb.Append("\r\n");
+                //name 为 上传文件的input name
+                string filename = "file";
+                sb.Append("Content-Disposition: form-data; name='MAX_FILE_SIZE'; filename=\"" + filename + "\"");
+                sb.Append("\r\n");
+                sb.Append("Content-Type: application/octet-stream"); //此处则为模拟的文件类型，实际情况下浏览器会根据本地文件后缀名判断此类型
+                sb.Append("\r\n\r\n");
+                Encoding encoding = Encoding.GetEncoding("gbk"); //此处编码须与网页编码一直 否则导致中文路径或文件名乱码 但文件内容不会乱码
+                byte[] form_data = encoding.GetBytes(sb.ToString());
 
-                        Stream ns = request.GetResponse().GetResponseStream();
+                //5、表尾数据
+                byte[] foot_data = encoding.GetBytes("\r\n--" + boundary + "--\r\n");
 
-                        long contentLength = request.GetResponse().ContentLength;
+                //6、读取文件
+                //StringBuilder sb2 = new StringBuilder();
+                //sb2.Append("--" + boundary);
+                //sb2.Append("\r\n");
+                //sb2.Append("Content-Disposition: form-data; name='username';\r\n"); //发送的内容标题
+                //sb2.Append("\r\n");
+                //sb2.Append("中文名称"); //发送的内容
+                //sb2.Append("\r\n"); //每一组数据结束都需要添加换行字符
+                //sb2.Append("--" + boundary);
+                //sb2.Append("\r\n");
+                //sb2.Append("Content-Disposition: form-data; name='pwd';\r\n");
+                //sb2.Append("\r\n");
+                //sb2.Append("QADSFDSFA");
+                //sb2.Append("\r\n");
 
-                        int length = ns.Read(buffer, 0, buffer.Length);
+                //byte[] data = encoding.GetBytes(sb2.ToString());
 
-                        while (length > 0)
-                        {
-                            fs.Write(buffer, 0, length);
+                //6、设置上传数据长度为表头 + 文件 + 表尾长度
+                //request.ContentLength = form_data.Length + foot_data.Length + file.Length + data.Length;
+                request.ContentLength = form_data.Length + foot_data.Length + file.Length;
 
-                            buffer = new byte[512];
+                //7、得到请求的数据流
+                Stream requestStream = request.GetRequestStream();
+                //8.1、将字符信息数据写入请求流
+                //requestStream.Write(data, 0, data.Length);
+                //8.2、将文件信息数据写入请求流
+                requestStream.Write(form_data, 0, form_data.Length);
 
-                            length = ns.Read(buffer, 0, buffer.Length);
-                        }
+                //9、循环读取文件流 并写入请求流
+                requestStream.Write(file, 0, file.Length);
 
-                        fs.Close();
-                        File.Move(fileTempFullPath, fileFullPath);
-                    }
-                    else
-                    {
-                        FileStream fs = new FileStream(fileTempFullPath, FileMode.Create);
+                //10、将结束边界数据写入请求流
+                requestStream.Write(foot_data, 0, foot_data.Length);
 
-                        byte[] buffer = new byte[512];
-                        HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(uri);
-                        request.Timeout = 10000;
-                        request.AddRange((int)fs.Length);
+                //11、发起请求
+                HttpWebResponse myResponse = request.GetResponse() as HttpWebResponse;
 
-                        Stream ns = request.GetResponse().GetResponseStream();
-
-                        long contentLength = request.GetResponse().ContentLength;
-
-                        int length = ns.Read(buffer, 0, buffer.Length);
-
-                        while (length > 0)
-                        {
-                            fs.Write(buffer, 0, length);
-
-                            buffer = new byte[512];
-
-                            length = ns.Read(buffer, 0, buffer.Length);
-                        }
-
-                        fs.Close();
-                        File.Move(fileTempFullPath, fileFullPath);
-                    }
-                    return true;
-                }
+                //12、读取请求返回的数据流
+                StreamReader sr = new StreamReader(myResponse.GetResponseStream(), encoding);
+                result = sr.ReadToEnd();
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return false;
+                return JsonHelper.SerializeObjectToJson(new { code = "999", msg = e.Message });
             }
+            Console.WriteLine("ypn....PostFile.....耗时: {0} 秒", DateTime.Now.Subtract(v_StartDT).TotalSeconds);
+            return result;
         }
-
-        /// <summary>
-        /// Http下载文件
-        /// </summary>
-        /// <param name="uri">下载地址</param>
-        /// <param name="filefullpath">存放完整路径（含文件名）</param>
-        /// <param name="size">每次多的大小</param>
-        /// <returns>下载操作是否成功</returns>
-        public static bool DownLoadFiles(string uri, string filefullpath, int size = 1024)
-        {
-            try
-            {
-                if (File.Exists(filefullpath))
-                {
-                    try
-                    {
-                        File.Delete(filefullpath);
-                    }
-                    catch (Exception)
-                    {
-                        return false;
-                    }
-                }
-                string fileDirectory = System.IO.Path.GetDirectoryName(filefullpath);
-                if (!Directory.Exists(fileDirectory))
-                {
-                    Directory.CreateDirectory(fileDirectory);
-                }
-                FileStream fs = new FileStream(filefullpath, FileMode.Create);
-                byte[] buffer = new byte[size];
-                HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(uri);
-                request.Timeout = 10000;
-                request.AddRange((int)fs.Length);
-
-                Stream ns = request.GetResponse().GetResponseStream();
-
-                long contentLength = request.GetResponse().ContentLength;
-
-                int length = ns.Read(buffer, 0, buffer.Length);
-
-                while (length > 0)
-                {
-                    fs.Write(buffer, 0, length);
-
-                    buffer = new byte[size];
-
-                    length = ns.Read(buffer, 0, buffer.Length);
-                }
-                fs.Close();
-                return true;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-        }
-
 
         #region 编码解码
         /// <summary>

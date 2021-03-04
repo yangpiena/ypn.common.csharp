@@ -22,13 +22,10 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Aspose.PSD;
 using Aspose.PSD.ImageOptions;
 using Aspose.PSD.FileFormats.Png;
 using Aspose.PSD.FileFormats.Ai;
-using System.IO;
 
 /**
  * https://github.com/aspose-psd/Aspose.PSD-for-.NET

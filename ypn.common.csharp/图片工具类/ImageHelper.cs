@@ -3,7 +3,6 @@ using System.IO;
 using System.Drawing;
 using System.Drawing.Imaging;
 using ImageMagick;
-using SimplePsd;
 using System.Collections.Generic;
 
 namespace ypn.common.csharp

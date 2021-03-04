@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
@@ -28,7 +29,8 @@ namespace Test
             {
                 string newImage = System.AppDomain.CurrentDomain.BaseDirectory + "ypn.png";
                 File.Delete(newImage);
-                label1.Text = YPN.ImageConvertPSD.PSD2PNG(openFileDialog1.FileName, newImage);
+                Dictionary<string,string> directory = YPN.ImageConvertPSD.PSD2PNG(openFileDialog1.FileName, newImage);
+                label1.Text = directory.ToString();
                 if (File.Exists(newImage))
                 {
                     pictureBox1.Image = Image.FromFile(newImage);

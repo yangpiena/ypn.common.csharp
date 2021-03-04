@@ -21,12 +21,10 @@
 ***********************************************************************/
 
 using Aspose.Imaging;
-using Aspose.Imaging.FileFormats.Psd;
 using Aspose.Imaging.ImageOptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace ypn.common.csharp
 {
@@ -165,8 +163,17 @@ namespace ypn.common.csharp
         public static string GetTIFLayer(string imagePath)
         {
             DateTime v_StartDT = DateTime.Now;
-            Aspose.Imaging.FileFormats.Tiff.TiffImage image = (Aspose.Imaging.FileFormats.Tiff.TiffImage)Aspose.Imaging.Image.Load(imagePath);
-            int layer = image.ExifData.ExifTags.Count();
+            int layer = 0;
+            try
+            {
+                Aspose.Imaging.FileFormats.Tiff.TiffImage image = (Aspose.Imaging.FileFormats.Tiff.TiffImage)Aspose.Imaging.Image.Load(imagePath);
+                layer = image.ExifData.ExifTags.Count();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                Console.WriteLine("YPN....GetTIFLayer....失败！耗时 {0} 秒", DateTime.Now.Subtract(v_StartDT).TotalSeconds);
+            }
             Console.WriteLine("YPN....GetTIFLayer....{0}，耗时 {1} 秒", layer, DateTime.Now.Subtract(v_StartDT).TotalSeconds);
             return layer.ToString();
         }

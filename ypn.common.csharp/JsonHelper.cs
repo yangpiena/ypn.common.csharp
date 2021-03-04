@@ -283,6 +283,26 @@ namespace ypn.common.csharp
         }
 
         /// <summary>
+        /// 读取Json文件，解析JSON字符串生成对象实体
+        /// </summary>
+        /// <typeparam name="T">对象类型</typeparam>
+        /// <param name="jsonFilePath">Json文件绝对路径</param>
+        /// <returns>对象实体</returns>
+        public static T DeserializeJsonFileToObject<T>(string jsonFilePath) where T : class
+        {
+            JsonSerializer serializer = new JsonSerializer();
+            using (System.IO.StreamReader file = System.IO.File.OpenText(jsonFilePath))
+            {
+                using (JsonTextReader reader = new JsonTextReader(file))
+                {
+                    object o = serializer.Deserialize(reader, typeof(T));
+                    T t = o as T;
+                    return t;
+                }
+            }
+        }
+
+        /// <summary>
         /// 解析JSON数组生成对象实体集合
         /// </summary>
         /// <typeparam name="T">对象类型</typeparam>
@@ -324,16 +344,34 @@ namespace ypn.common.csharp
             JObject obj = Newtonsoft.Json.Linq.JObject.Parse(json);
             if (data == "")
             {
+                if (obj.Property(key) == null)
+                {
+                    return "JSON格式错误，不存在 " + key;
+                }
                 return obj[key].ToString();
             }
             else
             {
+                if (obj.Property(data) == null)
+                {
+                    return "JSON格式错误，不存在 " + key;
+                }
                 if (num == "")
                 {
+                    JObject dataObj = Newtonsoft.Json.Linq.JObject.Parse(obj[data].ToString());
+                    if (dataObj.Property(key) == null)
+                    {
+                        return "JSON格式错误，不存在 " + key;
+                    }
                     return obj[data][key].ToString();
                 }
                 else
                 {
+                    JObject dataNumObj = Newtonsoft.Json.Linq.JObject.Parse(obj[data][num].ToString());
+                    if (dataNumObj.Property(key) == null)
+                    {
+                        return "JSON格式错误，不存在 " + key;
+                    }
                     return obj[data][num][key].ToString();
                 }
             }
