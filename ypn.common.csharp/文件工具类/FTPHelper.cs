@@ -270,7 +270,7 @@ namespace ypn.common.csharp
                 ftpStream.Close();
                 response.Close();
             }
-            catch (Exception ex)
+            catch (Exception)
             { }
         }
 
@@ -293,7 +293,7 @@ namespace ypn.common.csharp
                 ftpStream.Close();
                 response.Close();
             }
-            catch (Exception ex)
+            catch (Exception)
             { }
             return fileSize;
         }
@@ -316,7 +316,7 @@ namespace ypn.common.csharp
                 ftpStream.Close();
                 response.Close();
             }
-            catch (Exception ex)
+            catch (Exception)
             { }
         }
 

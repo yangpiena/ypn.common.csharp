@@ -1,5 +1,0 @@
-D:\YPNCloud\YPN.Git\ypn.common.csharp\SimplePsd\bin\Debug\SimplePsd.dll
-D:\YPNCloud\YPN.Git\ypn.common.csharp\SimplePsd\bin\Debug\SimplePsd.pdb
-D:\YPNCloud\YPN.Git\ypn.common.csharp\SimplePsd\obj\Debug\SimplePsd.csproj.CoreCompileInputs.cache
-D:\YPNCloud\YPN.Git\ypn.common.csharp\SimplePsd\obj\Debug\SimplePsd.dll
-D:\YPNCloud\YPN.Git\ypn.common.csharp\SimplePsd\obj\Debug\SimplePsd.pdb
