@@ -6,6 +6,7 @@ D:\YPNCloud\YPN.Git\ypn.common.csharp\ypn.common.csharp\bin\Release\Newtonsoft.J
 D:\YPNCloud\YPN.Git\ypn.common.csharp\ypn.common.csharp\bin\Release\Org.Mentalis.Security.dll
 D:\YPNCloud\YPN.Git\ypn.common.csharp\ypn.common.csharp\bin\Release\Tamir.SharpSSH.dll
 D:\YPNCloud\YPN.Git\ypn.common.csharp\ypn.common.csharp\bin\Release\Newtonsoft.Json.xml
+D:\YPNCloud\YPN.Git\ypn.common.csharp\ypn.common.csharp\obj\Release\ypn.common.csharp.csprojAssemblyReference.cache
 D:\YPNCloud\YPN.Git\ypn.common.csharp\ypn.common.csharp\obj\Release\ypn.common.csharp.csproj.CoreCompileInputs.cache
 D:\YPNCloud\YPN.Git\ypn.common.csharp\ypn.common.csharp\obj\Release\ypn.common.csharp.csproj.CopyComplete
 D:\YPNCloud\YPN.Git\ypn.common.csharp\ypn.common.csharp\obj\Release\ypn.common.csharp.dll
