@@ -21,7 +21,13 @@ namespace Test
 
         private void button1_Click(object sender, EventArgs e)
         {
-
+            textBox2.Text = YPN.EncodeHelper.AESEncode(textBox1.Text, "2021#03#01 14:01", "kpic@2021#aes123");
         }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            textBox4.Text = YPN.EncodeHelper.AESDecode(textBox3.Text, "2021#03#01 14:01", "kpic@2021#aes123");
+        }
+
     }
 }

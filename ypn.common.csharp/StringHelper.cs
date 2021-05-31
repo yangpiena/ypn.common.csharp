@@ -108,5 +108,6 @@ namespace ypn.common.csharp
             }
             return str.Substring(0, firstLength) + "..." + str.Substring(str.Length - lastLength, lastLength);
         }
+
     }
 }

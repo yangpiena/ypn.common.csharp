@@ -59,12 +59,20 @@ namespace ypn.common.csharp
             string strOupFileAllPath = Path.Combine(i_BasePath, i_TargetFolderName + ".tar.gz");
 
             Stream outTmpStream = new FileStream(strOupFileAllPath, FileMode.OpenOrCreate);
-
-            //注意此处源文件大小大于4096KB  
+            // 注意此处源文件大小大于4096KB  
             Stream outStream = new GZipOutputStream(outTmpStream);
             TarArchive archive = TarArchive.CreateOutputTarArchive(outStream, TarBuffer.DefaultBlockFactor);
-            TarEntry entry = TarEntry.CreateEntryFromFile(strSourceFolderAllPath);
-            archive.WriteEntry(entry, true);
+            // 打包目标文件夹下的所有文件
+            String[] files = Directory.GetFiles(strSourceFolderAllPath);
+            foreach (String name in files)
+            {
+                TarEntry entry = TarEntry.CreateEntryFromFile(name);
+                entry.Name = name.Substring(name.LastIndexOf('\\') + 1);
+                archive.WriteEntry(entry, true);
+            }
+            // 打包目标文件夹，包含目标文件夹
+            //TarEntry entry = TarEntry.CreateEntryFromFile(strSourceFolderAllPath);
+            //archive.WriteEntry(entry, true);
 
             if (archive != null)
             {
@@ -281,5 +289,6 @@ namespace ypn.common.csharp
                 return false;
             }
         }
+
     }
 }

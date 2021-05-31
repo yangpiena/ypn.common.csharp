@@ -29,7 +29,7 @@ using System.Text;
 namespace ypn.common.csharp
 {
     /// <summary>
-    /// 
+    /// 文件分块读
     /// <see cref="FileSplitSteamReader" langword="" />
     /// </summary>
     public class FileSplitSteamReader : FileStream
@@ -45,7 +45,7 @@ namespace ypn.common.csharp
             this.sourceFileName = sourceFileName;
         }
         /// <summary>
-        /// 用于大文件读取
+        /// 用于大文件分块读取
         /// </summary>
         /// <param name="sourceFileName">文件的路径</param>
         /// <param name="splitSize">切分大小</param>

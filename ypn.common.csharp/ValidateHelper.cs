@@ -11,6 +11,36 @@ namespace ypn.common.csharp
     /// </summary>
     public class ValidateHelper
     {
+        #region 验证TextBox的输入内容，仅限输入自然数
+        /// <summary>
+        /// 验证TextBox的输入内容，仅限输入自然数
+        /// YPN Create 2021-04-11
+        /// </summary>
+        /// <param name="r_TextBox"></param>
+        public static void ValidateNaturalNumber(ref TextBox r_TextBox)
+        {
+            Regex v_Regex = new Regex(@"^[0-9]\d*$");
+            string v_str = r_TextBox.Text;
+
+            if (!v_Regex.IsMatch(v_str))
+            {
+                string v_TmpText = string.Empty;
+                string v_NewText = string.Empty;
+
+                for (int i = 0; i < v_str.Length; i++)
+                {
+                    v_TmpText += v_str[i].ToString();
+                    if (v_Regex.IsMatch(v_TmpText))
+                    {
+                        v_NewText = v_TmpText;
+                    }
+                }
+                r_TextBox.Text = v_NewText;
+                r_TextBox.SelectionStart = r_TextBox.Text.Length;
+            }
+        }
+        #endregion
+
         #region 验证TextBox的输入内容，仅限输入正整数
         /// <summary>
         /// 验证TextBox的输入内容，仅限输入正整数
@@ -47,7 +77,7 @@ namespace ypn.common.csharp
         /// YPN Create 2018-09-28
         /// </summary>
         /// <param name="r_ComboBox"></param>
-        public static void ValidateInteger(ComboBox r_ComboBox)
+        public static void ValidateInteger(ref ComboBox r_ComboBox)
         {
             Regex v_Regex = new Regex(@"^[1-9]\d*$");
             string v_str = r_ComboBox.Text;
@@ -70,37 +100,7 @@ namespace ypn.common.csharp
             }
         }
         #endregion
-
-        #region 验证ComboBox的输入内容，仅限输入正整数
-        /// <summary>
-        /// 验证TextBox的输入内容，仅限输入整数
-        /// MMQ Create 2020-02-26
-        /// </summary>
-        /// <param name="r_TextBox"></param>
-        public static void ValidateRound(ref TextBox r_TextBox)
-        {
-            Regex v_Regex = new Regex(@"^[0-9]\d*$");
-            string v_str = r_TextBox.Text;
-
-            if (!v_Regex.IsMatch(v_str))
-            {
-                string v_TmpText = string.Empty;
-                string v_NewText = string.Empty;
-
-                for (int i = 0; i < v_str.Length; i++)
-                {
-                    v_TmpText += v_str[i].ToString();
-                    if (v_Regex.IsMatch(v_TmpText))
-                    {
-                        v_NewText = v_TmpText;
-                    }
-                }
-                r_TextBox.Text = v_NewText;
-                r_TextBox.SelectionStart = r_TextBox.Text.Length;
-            }
-        }
-        #endregion
-
+        
         #region 验证TextBox的输入内容，仅限输入浮点数
         /// <summary>
         /// 验证TextBox的输入内容，仅限输入浮点数
@@ -176,7 +176,10 @@ namespace ypn.common.csharp
                 r_TextBox.SelectionStart = r_TextBox.Text.Length;
             }
         }
-        public static void ValidatePositiveFloatForCbo(ref ComboBox r_TextBox)
+        #endregion
+
+        #region 验证ComboBox的输入内容，仅限输入正浮点数
+        public static void ValidatePositiveFloat(ref ComboBox r_TextBox)
         {
 
             Regex v_Regex = new Regex(@"^(\d+)(\.)?(\d+)?$");
@@ -207,28 +210,28 @@ namespace ypn.common.csharp
                 r_TextBox.SelectionStart = r_TextBox.Text.Length;
             }
         }
-        public static void ValidateSeniceFloat(ref TextBox r_TextBox)
+        #endregion
+
+        #region 验证TextBox的输入内容，禁止输入全角符
+        /// <summary>
+        /// 验证TextBox的输入内容，禁止输入全角符
+        /// YPN Create 2021-03-22
+        /// </summary>
+        /// <param name="r_TextBox"></param>
+        public static void ValidateNoFullAngleCharacter(ref TextBox r_TextBox)
         {
+            Regex v_Regex = new Regex(@"^[0-9a-zA-Z\u0000-\u00FF]+$");
+            string v_str = r_TextBox.Text;
 
-            string v_str = r_TextBox.Text.Trim();
-
-            if (!StringHelper.IsNumeric(v_str))
+            if (!v_Regex.IsMatch(v_str))
             {
                 string v_TmpText = string.Empty;
                 string v_NewText = string.Empty;
 
                 for (int i = 0; i < v_str.Length; i++)
                 {
-                    //根据美国用户习惯如果输入.554,自动让他变成0.554
-                    if (v_str[0].ToString() == ".")
-                    {
-                        v_TmpText += "0.";
-                    }
-                    else
-                    {
-                        v_TmpText += v_str[i].ToString();
-                    }
-                    if (StringHelper.IsNumeric(v_TmpText))
+                    v_TmpText += v_str[i].ToString();
+                    if (v_Regex.IsMatch(v_TmpText))
                     {
                         v_NewText = v_TmpText;
                     }
@@ -297,7 +300,7 @@ namespace ypn.common.csharp
         /// </summary>
         /// <param name="fileName"></param>
         /// <returns></returns>
-        public static bool CheckFileName(string fileName)
+        public static bool IsValidFileName(string fileName)
         {
             bool isValid = true;
             string[] strList = new string[] { "/", "\"", @"\", @"\/", ":", "*", "?", "<", ">", "|", "\r\n" };//" ",
@@ -320,7 +323,6 @@ namespace ypn.common.csharp
 
             return isValid;
         }
-
         #endregion
 
         #region 检查是否是纯数字
